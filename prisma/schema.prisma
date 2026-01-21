@@ -14,19 +14,30 @@ datasource db {
 }
 
 model User {
-  id        Int           @id @default(autoincrement())
-  email     String        @unique
+  id           Int           @id @default(autoincrement())
+  email        String        @unique
   passwordHash String
   role         String
-  createdAt DateTime      @default(now())
-  logs      ActivityLog[]
+  createdAt    DateTime      @default(now())
+  logs         ActivityLog[]
+  sessions     Session[]
+}
+
+model Session {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  user User @relation(fields: [userId], references: [id])
 }
 
 model Customer {
-  id        Int      @id @default(autoincrement())
-  region    String
-  isActive  Boolean
-  sales     Sale[]
+  id       Int     @id @default(autoincrement())
+  region   String
+  isActive Boolean
+  sales    Sale[]
 }
 
 model Product {
