@@ -6,7 +6,7 @@ import { createSession, deleteSession } from '@/lib/session'
 import { LoginFormSchema } from '@/lib/definitions'
 import { redirect } from 'next/navigation'
 
-export async function login(formData: FormData) {
+export async function login(prevState: unknown, formData: FormData) {
   // 1. Validate input
   const validatedFields = LoginFormSchema.safeParse({
     email: formData.get('email'),
@@ -38,7 +38,7 @@ export async function login(formData: FormData) {
   await createSession(user.id, user.role)
 
   // 5. Redirect (or return success for API)
-  redirect('/dashboard')
+  redirect('/')
 }
 
 export async function logout() {
