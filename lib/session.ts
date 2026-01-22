@@ -33,6 +33,14 @@ export async function decrypt(session: string | undefined = ''): Promise<Session
     return null
   }
 }
+// add type for session with user to session payload
+export type SessionWithUser = SessionPayload & {
+  user: {
+    id: number
+    email: string
+    role: string
+  }
+}
 
 // Create session in DB + set cookie
 export async function createSession(userId: number, role: string) {
@@ -65,7 +73,7 @@ export async function createSession(userId: number, role: string) {
 }
 
 // Verify session from cookie
-export async function verifySession(): Promise<SessionPayload | null> {
+export async function verifySession(): Promise<SessionWithUser | null> {
   const cookieStore = await cookies()
   const token = cookieStore.get('session')?.value
 
@@ -78,6 +86,7 @@ export async function verifySession(): Promise<SessionPayload | null> {
   // 2. Check if session exists in DB
   const dbSession = await prisma.session.findUnique({
     where: { id: payload.sessionId },
+    include: { user: true },
   })
 
   // 3. If not in DB or expired = invalid
@@ -88,7 +97,14 @@ export async function verifySession(): Promise<SessionPayload | null> {
     return null
   }
 
-  return payload
+  return {
+    ...payload,
+    user: {
+      id: dbSession.user.id,
+      email: dbSession.user.email,
+      role: dbSession.user.role,
+    },
+  }
 }
 
 // Delete session
@@ -98,7 +114,7 @@ export async function deleteSession() {
 
   if (token) {
     const payload = await decrypt(token)
-    
+
     // Delete session from DB
     if (payload?.sessionId) {
       await prisma.session.delete({
