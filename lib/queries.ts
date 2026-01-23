@@ -129,8 +129,19 @@ export async function getDashboardStats(): Promise<DashboardStats> {
 }
 
 // Query: Recent activity logs
-export async function getRecentActivity(): Promise<ActivityItem[]> {
+// Admin: sees all recent activity.                                         
+// Viewer (or non-admin): sees only their own recent activity.             
+export async function getRecentActivity(
+    userRole?: string,
+    userId?: number,
+): Promise<ActivityItem[]> {
+    const where =
+        userRole && userRole.toUpperCase() !== 'ADMIN' && userId
+            ? { userId } // non-admin: filter by current user only          
+            : undefined
+
     const logs = await prisma.activityLog.findMany({
+        where,
         take: 3,
         orderBy: { createdAt: "desc" },
         include: {

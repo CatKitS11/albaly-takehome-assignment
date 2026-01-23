@@ -21,7 +21,7 @@ export async function GET() {
     const [chartData, stats, activities] = await Promise.all([
       getSalesChartData(),
       getDashboardStats(),
-      getRecentActivity(),
+      getRecentActivity(session.user.role, session.user.id), // EDIT: role-based activity visibility
     ])
 
     // 3. return response

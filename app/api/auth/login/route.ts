@@ -44,7 +44,16 @@ export async function POST(request: NextRequest) {
     // 4. Create session
     const { token } = await createSession(user.id, user.role)
 
-    // 5. Return success with user info
+    // 5. Create activity log for login
+    await prisma.activityLog.create({
+      data: {
+        userId: user.id,
+        status: 'SUCCESS',
+        description: `${user.role === 'ADMIN' ? 'Admin' : user.role === 'VIEWER' ? 'Viewer' : user.email.split('@')[0]} logged in`,
+      },
+    })
+
+    // 6. Return success with user info
     return NextResponse.json({
       success: true,
       user: {
