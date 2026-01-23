@@ -1,28 +1,5 @@
 import prisma from "@/lib/prisma"
-
-// Type definitions
-export interface SalesChartData {
-    date: string
-    amount: number
-    quantity: number
-}
-
-export interface DashboardStats {
-    totalSales: number
-    salesGrowth: number
-    activeCustomers: number
-    customerGrowth: number
-    inventoryCount: number
-    inventoryChange: number
-}
-
-export interface ActivityItem {
-    id: number
-    status: string
-    description: string
-    createdAt: Date
-    userName: string
-}
+import type { SalesChartData, DashboardStats, ActivityItem } from "@/lib/types"
 
 // Query: Sales data for chart
 export async function getSalesChartData(): Promise<SalesChartData[]> {
@@ -85,7 +62,7 @@ export async function getRecentActivity(): Promise<ActivityItem[]> {
         id: log.id,
         status: log.status,
         description: log.description,
-        createdAt: log.createdAt,
+        createdAt: log.createdAt.toISOString(),
         userName: log.user.email,
     }))
 }
@@ -151,3 +128,28 @@ export async function getFunnelData() {
         { stage: "PURCHASE", count: latest.purchases, color: "bg-green-500" },
     ]
 }
+
+// Query: Customer drop-off (churn rate per week)
+export async function getCustomerDropOff() {
+    const funnelData = await prisma.funnelWeekly.findMany({
+      orderBy: { weekStart: 'desc' },
+      take: 4,
+    })
+  
+    // คำนวณ drop-off rate จาก funnel data
+    // drop-off = (visitors - purchases) / visitors * 100
+    return funnelData.map((week, index) => {
+      const dropOffRate = Math.round(
+        ((week.visitors - week.purchases) / week.visitors) * 100
+      )
+      const isHighest = dropOffRate === Math.max(
+        ...funnelData.map(w => Math.round(((w.visitors - w.purchases) / w.visitors) * 100))
+      )
+      
+      return {
+        week: 4 - index, // Week 1, 2, 3, 4
+        rate: dropOffRate,
+        highlight: isHighest,
+      }
+    }).reverse()
+  }

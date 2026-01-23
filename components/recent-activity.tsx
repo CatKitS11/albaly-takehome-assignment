@@ -5,7 +5,7 @@ import {
     IconInfoCircle,
   } from "@tabler/icons-react"
   import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-  import type { ActivityItem } from "@/lib/queries"
+  import type { ActivityItem } from "@/lib/types"
   
   interface RecentActivityProps {
     activities: ActivityItem[]
@@ -20,7 +20,8 @@ import {
   
   function getTimeAgo(date: Date): string {
     const now = new Date()
-    const diffMs = now.getTime() - date.getTime()
+    const dateObj = typeof date === 'string' ? new Date(date) : date
+    const diffMs = now.getTime() - dateObj.getTime()
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
     const diffDays = Math.floor(diffHours / 24)
   
@@ -55,7 +56,7 @@ import {
                       {activity.userName}
                     </p>
                     <p className="text-xs text-muted-foreground pt-1">
-                      {getTimeAgo(activity.createdAt)}
+                      {getTimeAgo(typeof activity.createdAt === 'string' ? new Date(activity.createdAt) : activity.createdAt)}
                     </p>
                   </div>
                 </div>

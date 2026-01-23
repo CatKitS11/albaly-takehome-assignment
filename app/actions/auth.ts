@@ -3,7 +3,7 @@
 import prisma from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 import { createSession, deleteSession } from '@/lib/session'
-import { LoginFormSchema } from '@/lib/definitions'
+import { LoginFormSchema } from '@/lib/types'
 import { redirect } from 'next/navigation'
 
 export async function login(prevState: unknown, formData: FormData) {

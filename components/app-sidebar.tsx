@@ -42,8 +42,8 @@ const data = {
       icon: IconChartBar,
     },
     {
-      title: "Insight",
-      url: "/insight",
+      title: "Insights",
+      url: "/insights",
       icon: IconChartPie,
     },
   ],
