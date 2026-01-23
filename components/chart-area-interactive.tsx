@@ -1,6 +1,8 @@
 "use client"
 import * as React from "react"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
+import { IconTrendingUp, IconTrendingDown } from "@tabler/icons-react"
+import { ArrowUp, ArrowDown } from "lucide-react"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import {
@@ -43,7 +45,7 @@ interface ChartAreaInteractiveProps {
 
 const chartConfig = {
   amount: {
-    label: "Amount ($)",
+    label: "Amount (฿)",
     color: "var(--primary)",
   },
   quantity: {
@@ -63,6 +65,8 @@ export function ChartAreaInteractive({
     if (isMobile) setTimeRange("7d")
   }, [isMobile])
 
+
+
   // Filter data based on timeRange
   const filteredData = React.useMemo(() => {
     if (!data.length) return []
@@ -79,6 +83,49 @@ export function ChartAreaInteractive({
     startDate.setDate(startDate.getDate() - daysToSubtract)
 
     return data.filter((item) => new Date(item.date) >= startDate)
+  }, [data, timeRange])
+
+  // คำนวณใน useMemo
+  const { totalRevenue, percentChange } = React.useMemo(() => {
+    if (!data.length) return { totalRevenue: 0, percentChange: 0 }
+
+    // หาวันล่าสุดใน data
+    const dates = data.map((d) => new Date(d.date).getTime())
+    const referenceDate = new Date(Math.max(...dates))
+
+    let daysToSubtract = 90
+    if (timeRange === "30d") daysToSubtract = 30
+    else if (timeRange === "7d") daysToSubtract = 7
+
+    // Current period
+    const currentStart = new Date(referenceDate)
+    currentStart.setDate(currentStart.getDate() - daysToSubtract)
+
+    // Previous period (same duration before current)
+    const previousStart = new Date(currentStart)
+    previousStart.setDate(previousStart.getDate() - daysToSubtract)
+
+    // Filter data for each period
+    const currentPeriod = data.filter((item) => {
+      const d = new Date(item.date)
+      return d >= currentStart && d <= referenceDate
+    })
+
+    const previousPeriod = data.filter((item) => {
+      const d = new Date(item.date)
+      return d >= previousStart && d < currentStart
+    })
+
+    // Sum amounts
+    const currentTotal = currentPeriod.reduce((sum, item) => sum + item.amount, 0)
+    const previousTotal = previousPeriod.reduce((sum, item) => sum + item.amount, 0)
+
+    // Calculate % change
+    const change = previousTotal > 0
+      ? Math.round(((currentTotal - previousTotal) / previousTotal) * 100)
+      : 0
+
+    return { totalRevenue: currentTotal, percentChange: change }
   }, [data, timeRange])
 
   return (
@@ -159,6 +206,16 @@ export function ChartAreaInteractive({
             />
           </AreaChart>
         </ChartContainer>
+        <div className="flex justify-between items-center px-2 pt-4 sm:px-6">
+          <p className="text-sm text-muted-foreground">
+            Total Revenue: <span className="font-semibold text-foreground">
+              {totalRevenue.toLocaleString()} ฿
+            </span>
+          </p>
+          <p className={`text-sm font-medium ${percentChange >= 0 ? "text-green-600" : "text-red-600"}`}>
+            {percentChange >= 0 ? <ArrowUp size={12} className="mr-1 inline-block" /> : <ArrowDown size={12} className="mr-1 inline-block" />} {Math.abs(percentChange)}% vs last period
+          </p>
+        </div>
       </CardContent>
     </Card>
   )

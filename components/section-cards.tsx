@@ -65,10 +65,18 @@ export function SectionCards({ stats }: SectionCardsProps) {
             <div className="text-2xl font-bold">{stats.activeCustomers}</div>
             <Badge
               variant="secondary"
-              className="bg-green-100 text-green-700 hover:bg-green-100"
+              className={
+                stats.customerGrowth >= 0
+                  ? "bg-green-100 text-green-700 hover:bg-green-100"
+                  : "bg-red-100 text-red-700 hover:bg-red-100"
+              }
             >
-              <IconTrendingUp size={12} className="mr-1" />
-              {stats.customerGrowth}%
+              {stats.customerGrowth >= 0 ? (
+                <IconTrendingUp size={12} className="mr-1" />
+              ) : (
+                <IconTrendingDown size={12} className="mr-1" />
+              )}
+              {Math.abs(stats.customerGrowth)}%
             </Badge>
           </div>
         </CardContent>

@@ -30,21 +30,101 @@ export async function getSalesChartData(): Promise<SalesChartData[]> {
 
 // Query: Dashboard statistics
 export async function getDashboardStats(): Promise<DashboardStats> {
-    const [salesCount, activeCustomers, inventoryData] = await Promise.all([
+    const now = new Date()
+    const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+    const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+
+    const [
+        salesCount,
+        activeCustomers,
+        inventoryData,
+        // Sales growth data
+        thisMonthSales,
+        lastMonthSales,
+        // Customer growth data (unique customers with sales)
+        thisMonthCustomers,
+        lastMonthCustomers,
+        // Inventory snapshots for change calculation
+        inventorySnapshots,
+    ] = await Promise.all([
         prisma.sale.count(),
         prisma.customer.count({ where: { isActive: true } }),
         prisma.inventorySnapshot.aggregate({
             _sum: { onHand: true },
         }),
+        // This month sales amount
+        prisma.sale.aggregate({
+            _sum: { amount: true },
+            where: { createdAt: { gte: thisMonthStart } },
+        }),
+        // Last month sales amount
+        prisma.sale.aggregate({
+            _sum: { amount: true },
+            where: {
+                createdAt: { gte: lastMonthStart, lt: thisMonthStart },
+            },
+        }),
+        // Unique customers this month
+        prisma.sale.findMany({
+            where: { createdAt: { gte: thisMonthStart } },
+            select: { customerId: true },
+            distinct: ["customerId"],
+        }),
+        // Unique customers last month
+        prisma.sale.findMany({
+            where: { createdAt: { gte: lastMonthStart, lt: thisMonthStart } },
+            select: { customerId: true },
+            distinct: ["customerId"],
+        }),
+        // Get inventory snapshots grouped by date
+        prisma.inventorySnapshot.findMany({
+            orderBy: { createdAt: "desc" },
+            select: { onHand: true, createdAt: true },
+        }),
     ])
+
+    // Calculate sales growth %
+    const thisAmount = thisMonthSales._sum.amount ?? 0
+    const lastAmount = lastMonthSales._sum.amount ?? 0
+    const salesGrowth =
+        lastAmount > 0
+            ? Math.round(((thisAmount - lastAmount) / lastAmount) * 100)
+            : 0
+
+    // Calculate customer growth %
+    const thisCustomerCount = thisMonthCustomers.length
+    const lastCustomerCount = lastMonthCustomers.length
+    const customerGrowth =
+        lastCustomerCount > 0
+            ? Math.round(
+                  ((thisCustomerCount - lastCustomerCount) / lastCustomerCount) * 100
+              )
+            : 0
+
+    // Calculate inventory change %
+    const byDate = inventorySnapshots.reduce(
+        (acc, snap) => {
+            const dateKey = snap.createdAt.toISOString().split("T")[0]
+            acc[dateKey] = (acc[dateKey] || 0) + snap.onHand
+            return acc
+        },
+        {} as Record<string, number>
+    )
+    const dates = Object.keys(byDate).sort().reverse()
+    const latestTotal = byDate[dates[0]] ?? 0
+    const previousTotal = byDate[dates[1]] ?? latestTotal
+    const inventoryChange =
+        previousTotal > 0
+            ? Math.round(((latestTotal - previousTotal) / previousTotal) * 100)
+            : 0
 
     return {
         totalSales: salesCount,
-        salesGrowth: 12,
+        salesGrowth,
         activeCustomers,
-        customerGrowth: 8,
+        customerGrowth,
         inventoryCount: inventoryData._sum.onHand ?? 0,
-        inventoryChange: -3,
+        inventoryChange,
     }
 }
 
@@ -136,7 +216,7 @@ export async function getCustomerDropOff() {
       take: 4,
     })
   
-    // คำนวณ drop-off rate จาก funnel data
+    // calculate drop-off rate from funnel data
     // drop-off = (visitors - purchases) / visitors * 100
     return funnelData.map((week, index) => {
       const dropOffRate = Math.round(
