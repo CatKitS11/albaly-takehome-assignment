@@ -2,8 +2,8 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Demo Seed Credentials
 
-- Admin: `admin@albaly.com` / `admin123`
-- Viewer: `viewer@albaly.com` / `viewer123`
+- Admin: `admin@albaly.com` / `admin0001`
+- Viewer: `viewer@albaly.com` / `viewer0001`
 
 ## Getting Started
 

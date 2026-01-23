@@ -7,7 +7,7 @@ import {
 } from "@tabler/icons-react"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import type { DashboardStats } from "@/lib/queries"
+import type { DashboardStats } from "@/lib/types"
 
 interface SectionCardsProps {
   stats: DashboardStats

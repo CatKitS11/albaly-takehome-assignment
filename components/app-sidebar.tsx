@@ -2,21 +2,7 @@
 
 import * as React from "react"
 import {
-  IconCamera,
   IconChartBar,
-  IconDashboard,
-  IconDatabase,
-  IconFileAi,
-  IconFileDescription,
-  IconFileWord,
-  IconFolder,
-  IconHelp,
-  IconInnerShadowTop,
-  IconListDetails,
-  IconReport,
-  IconSearch,
-  IconSettings,
-  IconUsers,
   IconChartPie,
 } from "@tabler/icons-react"
 
@@ -32,7 +18,6 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { logout } from "@/app/actions/auth"
-import { redirect } from "next/navigation"
 
 const data = {
   navMain: [
@@ -72,7 +57,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarFooter>
         <Button className=" h-12 w-full" onClick={() => {
           logout()
-          redirect("/login")
         }}>
           Logout
         </Button>
