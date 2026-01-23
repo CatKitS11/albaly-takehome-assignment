@@ -30,7 +30,7 @@ Use these credentials after running the seed:
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/CatKitS11/albaly-takehome-assignment.git
 cd albaly-takehome-assignment
 ```
 
@@ -57,7 +57,7 @@ Required environment variables:
 ```env
 DATABASE_URL=postgresql://user:password@localhost:5432/albaly_db
 SESSION_SECRET=your-secret-here-change-in-production
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=your-app-url
 ```
 
 **Important**: 
@@ -262,11 +262,3 @@ Ensure all environment variables are set:
 - Run `npx prisma generate` if Prisma client is missing
 - Clear `.next` folder: `rm -rf .next`
 - Reinstall dependencies: `rm -rf node_modules && npm install`
-
-## License
-
-This project is a take-home assignment for Albaly.
-
-## Contact
-
-For questions or issues, please refer to the assignment requirements or contact the hiring team.
