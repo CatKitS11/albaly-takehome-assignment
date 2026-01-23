@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
 
     if (!validatedFields.success) {
       return NextResponse.json(
-        { error: 'Invalid fields', details: validatedFields.error.flatten().fieldErrors },
+        { error: { code: 'VALIDATION_ERROR', message: 'Invalid fields', details: validatedFields.error.flatten().fieldErrors } },
         { status: 400 }
       )
     }
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json(
-        { error: 'Invalid email or password' },
+        { error: { code: 'INVALID_CREDENTIALS', message: 'Invalid email or password' } },
         { status: 401 }
       )
     }
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     const passwordMatch = await bcrypt.compare(password, user.passwordHash)
     if (!passwordMatch) {
       return NextResponse.json(
-        { error: 'Invalid email or password' },
+        { error: { code: 'INVALID_CREDENTIALS', message: 'Invalid email or password' } },
         { status: 401 }
       )
     }
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Login error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: { code: 'INTERNAL_ERROR', message: 'Internal server error' } },
       { status: 500 }
     )
   }

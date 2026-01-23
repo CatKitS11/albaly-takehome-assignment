@@ -8,7 +8,7 @@ export async function GET() {
     
     if (!session) {
       return NextResponse.json(
-        { error: 'Not authenticated' },
+        { error: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
         { status: 401 }
       )
     }
@@ -26,7 +26,7 @@ export async function GET() {
 
     if (!user) {
       return NextResponse.json(
-        { error: 'User not found' },
+        { error: { code: 'USER_NOT_FOUND', message: 'User not found' } },
         { status: 404 }
       )
     }
@@ -40,7 +40,7 @@ export async function GET() {
   } catch (error) {
     console.error('Get user error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: { code: 'INTERNAL_ERROR', message: 'Internal server error' } },
       { status: 500 }
     )
   }
