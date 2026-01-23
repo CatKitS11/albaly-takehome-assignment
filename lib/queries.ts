@@ -131,7 +131,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
 // Query: Recent activity logs
 export async function getRecentActivity(): Promise<ActivityItem[]> {
     const logs = await prisma.activityLog.findMany({
-        take: 5,
+        take: 3,
         orderBy: { createdAt: "desc" },
         include: {
             user: { select: { email: true } },
@@ -203,9 +203,9 @@ export async function getFunnelData() {
     const latest = funnel[0]
     return [
         { stage: "VISITORS", count: latest.visitors, color: "bg-blue-500" },
-        { stage: "PRODUCT VIEWS", count: latest.productViews, color: "bg-yellow-500" },
-        { stage: "ADD TO CART", count: latest.addToCart, color: "bg-yellow-500" },
-        { stage: "PURCHASE", count: latest.purchases, color: "bg-green-500" },
+        { stage: "PRODUCT VIEWS", count: latest.productViews, color: "bg-blue-500" },
+        { stage: "ADD TO CART", count: latest.addToCart, color: "bg-blue-500" },
+        { stage: "PURCHASE", count: latest.purchases, color: "bg-yellow-500" },
     ]
 }
 

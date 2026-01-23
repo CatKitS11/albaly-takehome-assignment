@@ -99,9 +99,17 @@ export function SectionCards({ stats }: SectionCardsProps) {
             </div>
             <Badge
               variant="secondary"
-              className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100"
+              className={
+                stats.inventoryChange >= 0
+                  ? "bg-green-100 text-green-700 hover:bg-green-100"
+                  : "bg-red-100 text-red-700 hover:bg-red-100"
+              }
             >
-              <IconTrendingDown size={12} className="mr-1" />
+              {stats.inventoryChange >= 0 ? (
+                <IconTrendingUp size={12} className="mr-1" />
+              ) : (
+                <IconTrendingDown size={12} className="mr-1" />
+              )}
               {Math.abs(stats.inventoryChange)}%
             </Badge>
           </div>

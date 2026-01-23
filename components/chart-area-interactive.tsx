@@ -1,7 +1,6 @@
 "use client"
 import * as React from "react"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
-import { IconTrendingUp, IconTrendingDown } from "@tabler/icons-react"
 import { ArrowUp, ArrowDown } from "lucide-react"
 
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -45,7 +44,7 @@ interface ChartAreaInteractiveProps {
 
 const chartConfig = {
   amount: {
-    label: "Amount (฿)",
+    label: "Amount ($)",
     color: "var(--primary)",
   },
   quantity: {
@@ -209,7 +208,7 @@ export function ChartAreaInteractive({
         <div className="flex justify-between items-center px-2 pt-4 sm:px-6">
           <p className="text-sm text-muted-foreground">
             Total Revenue: <span className="font-semibold text-foreground">
-              {totalRevenue.toLocaleString()} ฿
+              $ {totalRevenue.toLocaleString()}
             </span>
           </p>
           <p className={`text-sm font-medium ${percentChange >= 0 ? "text-green-600" : "text-red-600"}`}>

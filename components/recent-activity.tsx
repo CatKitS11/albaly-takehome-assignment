@@ -1,5 +1,4 @@
 import {
-    IconClock,
     IconCircleCheck,
     IconAlertTriangle,
     IconInfoCircle,
